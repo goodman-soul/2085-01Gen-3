@@ -8,14 +8,19 @@ function toCamelCaseSetting(row: any): Setting {
   }
 }
 
-export function getSettings(): Record<string, string> {
+export function getSettings(): Setting[] {
   const db = getDb()
   const rows = db.prepare('SELECT * FROM settings').all()
-  const settings: Record<string, string> = {}
-  rows.forEach((row: any) => {
-    settings[row.key] = row.value
+  return rows.map(toCamelCaseSetting)
+}
+
+export function getSettingsMap(): Record<string, string> {
+  const settings = getSettings()
+  const map: Record<string, string> = {}
+  settings.forEach((s) => {
+    map[s.key] = s.value
   })
-  return settings
+  return map
 }
 
 export function updateSettings(data: Record<string, string>): boolean {

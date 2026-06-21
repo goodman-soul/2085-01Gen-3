@@ -20,7 +20,18 @@ async function request<T>(
       ...options,
     });
 
-    const data = await response.json() as ApiResponse<T>;
+    const text = await response.text();
+    let data: ApiResponse<T>;
+
+    try {
+      data = JSON.parse(text) as ApiResponse<T>;
+    } catch (parseError) {
+      console.error(`API Parse Error [${options.method || 'GET'} ${url}]:`, 
+        'Response body:', text ? text.substring(0, 200) : '(empty)');
+      throw new Error(
+        text ? `服务器返回了无效的响应格式` : '服务器无响应，请检查服务是否正常运行'
+      );
+    }
 
     if (!response.ok || !data.success) {
       throw new Error(data.error || `HTTP error! status: ${response.status}`);

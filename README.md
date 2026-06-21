@@ -1,57 +1,154 @@
-# React + TypeScript + Vite
+# 写字楼咖啡机补货管理系统
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+一套面向写字楼场景的咖啡机智能运营管理系统，实现设备状态监控、自动补货预警、销量异常检测与归因分析等核心功能。
 
-Currently, two official plugins are available:
+## 功能特性
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 🏠 首页概览
+- 实时统计：设备总数、在线数、故障数、待处理任务数、异常数
+- 楼层设备状态分布，快速定位问题楼层
+- 待处理补货任务列表
+- 近期销量异常预警
 
-## Expanding the ESLint configuration
+### 📱 设备管理
+- 按楼层查看所有咖啡机设备
+- 实时显示豆仓、奶盒、水箱、杯子剩余量
+- 设备故障码展示与状态监控
+- 设备历史状态记录查询
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 📦 补货管理
+- 自动生成补货任务（物料低于 30% 预警）
+- 按楼层分组展示补货需求
+- 补货任务状态追踪（待处理/进行中/已完成）
+- 补货历史记录查询
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 📊 销量分析
+- 销量趋势图表展示
+- 日销量与 7 日均值对比
+- 产品销量排行
+
+### ⚠️ 异常检测
+- 自动检测销量异常（日销量较 7 日均值下降超过 30%）
+- 智能归因引擎（优先级：停机 → 断货 → 口味下架 → 未知）
+- 异常确认与处理
+
+### ⚙️ 系统设置
+- 预警阈值配置
+- 系统参数管理
+
+## 技术栈
+
+### 前端
+- **框架**: React 18 + TypeScript
+- **构建工具**: Vite 6
+- **样式**: Tailwind CSS 3
+- **状态管理**: Zustand
+- **路由**: React Router DOM 7
+- **图表**: Recharts
+- **图标**: lucide-react
+
+### 后端
+- **运行时**: Node.js
+- **框架**: Express 4 + TypeScript
+- **数据库**: SQLite (better-sqlite3)
+- **开发工具**: tsx + nodemon
+
+## 快速开始
+
+### 环境要求
+- Node.js >= 18
+- npm >= 9
+
+### 安装依赖
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 启动开发服务
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm run dev
 ```
+
+前端服务默认运行在 `http://localhost:5173`，后端 API 服务运行在 `http://localhost:3188`，Vite 会自动代理 `/api` 前缀的请求到后端。
+
+### 其他命令
+
+```bash
+# 类型检查
+npm run check
+
+# 前端开发服务
+npm run client:dev
+
+# 后端开发服务
+npm run server:dev
+
+# 构建生产版本
+npm run build
+```
+
+## 项目结构
+
+```
+.
+├── api/                    # 后端代码
+│   ├── db/                # 数据库层
+│   │   ├── index.ts       # 数据库连接与初始化
+│   │   └── mockData.ts    # 模拟数据
+│   ├── routes/            # API 路由
+│   ├── services/          # 业务逻辑
+│   └── server.ts          # 服务入口
+├── src/                    # 前端代码
+│   ├── components/        # 组件
+│   ├── pages/             # 页面
+│   ├── lib/               # 工具库
+│   ├── store/             # 状态管理
+│   └── App.tsx            # 应用入口
+├── shared/                 # 共享类型定义
+├── data/                   # SQLite 数据库文件（自动生成）
+└── README.md
+```
+
+## 核心算法
+
+### 补货需求计算
+- 实时监控设备物料（豆仓、奶盒、水箱、杯子）剩余量
+- 当剩余量低于容量的 30% 时，自动触发补货预警
+- 按楼层分组生成补货任务，提高运营效率
+
+### 销量异常检测
+- 计算每台设备过去 7 天的平均日销量
+- 当日销量较 7 日均值下降超过 30% 时，判定为销量异常
+- 自动记录异常并触发告警
+
+### 自动归因引擎
+当检测到销量异常时，按以下优先级自动判断原因：
+1. **停机**：设备存在故障码或离线状态
+2. **断货**：关键物料（豆仓/奶盒）已耗尽
+3. **口味下架**：相关产品被标记为下架状态
+4. **未知**：无法自动归因，需人工排查
+
+## 数据库设计
+
+系统包含 8 张核心表：
+- `floor` - 楼层信息
+- `device` - 设备信息
+- `device_status` - 设备状态历史
+- `replenishment_task` - 补货任务
+- `replenishment_item` - 补货明细
+- `product` - 产品信息
+- `sales_record` - 销售记录
+- `sales_anomaly` - 销量异常记录
+- `settings` - 系统设置
+
+## 常见问题
+
+### 首页出现"加载失败"怎么办？
+1. 检查后端服务是否正常启动（端口 3188）
+2. 查看控制台报错信息
+3. 确认 `data/` 目录下数据库文件是否正常生成
+
+### 如何重置数据？
+删除 `data/` 目录，重启服务后会自动重新初始化数据库并填充模拟数据。
